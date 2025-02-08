@@ -52,8 +52,7 @@ public sealed class CartPole : IEnvironmentAsync<float[]>
     {
         float Penalty()
         {
-            // Console.WriteLine("Penalty");
-            return -10; //Math.Min(-10, (float)player.Points / 100 * -1);
+            return -1;
         }
 
         float TryUpgrade(IUpgradable upgradable)
@@ -62,9 +61,9 @@ public sealed class CartPole : IEnvironmentAsync<float[]>
 
             if (player.TrySpendResources(upgradable.UpgradeCost))
             {
-                // Console.WriteLine($"Upgrade {upgradable.GetType().Name} {upgradable.Level}");
                 upgradable.Upgrade();
-                return (float)(player.Points - currentPoints);
+                var gainedPoints = (float)(player.Points - currentPoints);
+                return (float)Math.Log10(gainedPoints + 1);
             }
 
             return Penalty();
@@ -72,9 +71,8 @@ public sealed class CartPole : IEnvironmentAsync<float[]>
 
         float ProceedToNextDay()
         {
-            // Console.WriteLine("Cash");
             player.ProceedToNextDay();
-            return 10;
+            return 1;
         }
 
         var planetIndex = (int)Math.Floor((action - 1) / 3d);

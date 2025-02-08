@@ -13,7 +13,11 @@ public class TrainingHostedService : IHostedService
     public async Task StartAsync(CancellationToken cancellationToken)
     {        
         var opts = new DQNAgentOptions() {
-            Depth = 4
+            Depth = 4,
+            EPS_DECAY = 1000,
+            LR = 0.00001f,
+            TAU = 0.005f,
+            GAMMA = 0.95f
         };
 
         const string saveDirectory = @"C:/Users/Elsahr/Downloads/agent_storage";
@@ -34,7 +38,7 @@ public class TrainingHostedService : IHostedService
         {
             var identifier = DateTime.Now.ToString("yyyy'_'MM'_'dd'_'HH'_'mm'_'ss");
 
-            for (int i = 0; i < 8000 * 3; i++)
+            for (int i = 0; i < 8000 * 2; i++)
             {
                 await myAgent.Step();
             }
