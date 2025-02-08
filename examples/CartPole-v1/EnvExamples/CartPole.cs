@@ -1,69 +1,157 @@
-﻿using Gym.Environments.Envs.Classic;
-using Gym.Rendering.WinForm;
+﻿using System;
+using System.Threading.Tasks;
+using OGameSim.Entities;
+using OGameSim.Production;
 using OneOf;
 using RLMatrix;
 
-public class CartPole : IEnvironment<float[]>
+public sealed class CartPole : IEnvironmentAsync<float[]>
 {
-    public int stepCounter { get; set; }
-    public int maxSteps { get; set; }
-    public bool isDone { get; set; }
-    public OneOf<int, (int, int)> stateSize { get; set; }
-    public int[] actionSize { get; set; }
+    private const int _stateSize = 614;
+    private const int _maxSteps = 8000;
 
-    CartPoleEnv myEnv;
+    private readonly float[] _state = new float[_stateSize];
 
-    private float[] myState;
+    private int _stepCounter = 0;
+    private Player player = new();
 
-    public CartPole()
+    public OneOf<int, (int, int)> stateSize { get; set; } = _stateSize;
+    public int[] actionSize { get; set; } = [63];
+
+    public Task<float[]> GetCurrentState()
     {
-        //TODO: it should be more obvious to put Initalise method in constructor or something since its not called later. 
-        //Create base constructor that calls initialise method if not initialised???
-        Initialise();
+        return Task.FromResult(_state);
     }
 
-    public float[] GetCurrentState()
+    public Task Reset()
     {
-        if (myState == null)
-            myState = new float[4] { 0, 0, 0, 0 };
-        return myState;
+        player = new();
+        _stepCounter = 0;
+        Array.Fill(_state, 0);
+        UpdateState();
+
+        return Task.CompletedTask;
     }
 
-    public void Initialise()
-    {
-        myEnv = new CartPoleEnv(WinFormEnvViewer.Factory);
-        stepCounter = 0;
-        maxSteps = 100000;
-        stateSize = myEnv.ObservationSpace.Shape.Size;
-        actionSize = new int[] { myEnv.ActionSpace.Shape.Size };
-        myEnv.Reset();
-        isDone = false;
-    }
-
-    public void Reset()
-    {
-        myEnv.Reset();
-        isDone = false;
-        stepCounter = 0;
-    }
-
-    public float Step(int[] actionsIds)
+    public Task<(float, bool)> Step(int[] actionsIds)
     {
         var actionId = actionsIds[0];
+        var reward = ApplyAction(player, actionId);
+        UpdateState();
 
-        var (observation, reward, _done, information) = myEnv.Step(actionId);
-        SixLabors.ImageSharp.Image img = myEnv.Render();
-        myState = observation.ToFloatArray();
-        isDone = _done;
+        _stepCounter++;  
 
-        if (stepCounter > maxSteps)
-            isDone = true;
-
-        if (isDone)
-        {
-            reward = 0;
+        if (_stepCounter > _maxSteps) {
+            return Task.FromResult((0f, true));
         }
 
+        return Task.FromResult((reward, false));
+    }
+
+    public static float ApplyAction(Player player, int action)
+    {
+        float Penalty()
+        {
+            // Console.WriteLine("Penalty");
+            return -10; //Math.Min(-10, (float)player.Points / 100 * -1);
+        }
+
+        float TryUpgrade(IUpgradable upgradable)
+        {
+            var currentPoints = player.Points;
+
+            if (player.TrySpendResources(upgradable.UpgradeCost))
+            {
+                // Console.WriteLine($"Upgrade {upgradable.GetType().Name} {upgradable.Level}");
+                upgradable.Upgrade();
+                return (float)(player.Points - currentPoints);
+            }
+
+            return Penalty();
+        }
+
+        float ProceedToNextDay()
+        {
+            // Console.WriteLine("Cash");
+            player.ProceedToNextDay();
+            return 10;
+        }
+
+        var planetIndex = (int)Math.Floor((action - 1) / 3d);
+        if (planetIndex > player.Planets.Count - 1)
+        {
+            return Penalty();
+        }
+
+        var reward = (action, action % 3) switch
+        {
+            (0, _) => ProceedToNextDay(),
+            (1, _) => TryUpgrade(player.Astrophysics),
+            (2, _) => TryUpgrade(player.PlasmaTechnology),
+            (_, 0) => TryUpgrade(player.Planets[planetIndex].MetalMine),
+            (_, 1) => TryUpgrade(player.Planets[planetIndex].CrystalMine),
+            (_, 2) => TryUpgrade(player.Planets[planetIndex].DeuteriumSynthesizer),
+            _ => throw new NotImplementedException(),
+        };
+
         return reward;
+    }
+
+    public void UpdateState()
+    {
+        var currentIndex = 0;
+
+        void SetStateValue(float value){
+            _state[currentIndex] = value;
+            currentIndex++;
+        }
+
+        void AddResources(Resources resources)
+        {
+            SetStateValue(resources.Metal);
+            SetStateValue(resources.Crystal);
+            SetStateValue(resources.Deuterium);
+        }
+
+        void AddResourcesModifier(ResourcesModifier resourcesModifier)
+        {
+            SetStateValue((float)resourcesModifier.Metal);
+            SetStateValue((float)resourcesModifier.Crystal);
+            SetStateValue((float)resourcesModifier.Deuterium);
+        }
+
+        // Player
+        AddResources(player.Resources);
+
+        // Plasma
+        SetStateValue(player.PlasmaTechnology.Level);
+        AddResourcesModifier(player.PlasmaTechnology.Modifier);
+        AddResources(player.PlasmaTechnology.UpgradeCost);
+
+        // Astro
+        SetStateValue(player.Astrophysics.Level);
+        AddResources(player.Astrophysics.UpgradeCost);
+
+        // Planets
+        foreach (var planet in player.Planets)
+        {
+            // Metal
+            SetStateValue(planet.MetalMine.Level);
+            AddResources(planet.MetalMine.UpgradeCost);
+            AddResources(planet.MetalMine.TodaysProduction);
+            AddResources(planet.MetalMine.UpgradeIncreasePerDay);
+
+            // Crystal
+            SetStateValue(planet.CrystalMine.Level);
+            AddResources(planet.CrystalMine.UpgradeCost);
+            AddResources(planet.CrystalMine.TodaysProduction);
+            AddResources(planet.CrystalMine.UpgradeIncreasePerDay);
+
+            // Deut
+            SetStateValue(planet.DeuteriumSynthesizer.Level);
+            AddResources(planet.DeuteriumSynthesizer.UpgradeCost);
+            AddResources(planet.DeuteriumSynthesizer.TodaysProduction);
+            AddResources(planet.DeuteriumSynthesizer.UpgradeIncreasePerDay);
+        }
     }
 }

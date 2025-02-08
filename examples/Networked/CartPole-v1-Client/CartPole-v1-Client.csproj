@@ -19,6 +19,7 @@
 		<PackageReference Include="TorchSharp-cuda-windows" Version="0.102.2" />
 		<PackageReference Include="TorchVision" Version="0.102.2" />
 		<PackageReference Include="WinForms.DataVisualization" Version="1.8.0" />
+		<ProjectReference Include="C:\Code\gpolcode\OGameSim\Game\Game.csproj" />
 	</ItemGroup>
 
 	<!--<ItemGroup>

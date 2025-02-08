@@ -1,0 +1,34 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Client",
+            "type": "dotnet",
+            "request": "launch",
+            "projectPath": "C:/Code/RL_Matrix/examples/Networked/CartPole-v1-Client/CartPole-v1-Client.csproj"
+        },
+
+        {
+            "name": "Server",
+            "type": "dotnet",
+            "request": "launch",
+            "projectPath": "C:/Code/RL_Matrix/examples/Networked/CartPole-v1-Server/CartPole-v1-Server.csproj"
+        },
+        
+        {
+            "name": "Dashboard",
+            "type": "dotnet",
+            "request": "launch",
+            "projectPath": "C:/Code/RL_Matrix/src/RLMatrix.Dashboard/RLMatrix.Dashboard.csproj"
+        }
+    ],
+    "compounds": [
+        {
+            "name": "Server/Client",
+            "configurations": ["Server", "Client", "Dashboard"]
+        }
+    ]
+}
