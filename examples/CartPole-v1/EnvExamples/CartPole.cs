@@ -75,7 +75,7 @@ public sealed class CartPole : IEnvironmentAsync<float[]>
             return 1;
         }
 
-        var planetIndex = (int)Math.Floor((action - 1) / 3d);
+        var planetIndex = (int)Math.Floor(action / 3d) - 1;
         if (planetIndex > player.Planets.Count - 1)
         {
             return Penalty();
