@@ -8,7 +8,7 @@ public static class Meters
 
     private static readonly Histogram<double> _actorLearningRate;
     private static readonly Histogram<double> _reward;
-    private static readonly Histogram<double> _epLength;
+    private static readonly Histogram<int> _epLength;
     private static readonly Histogram<double> _actorLoss;
     private static readonly Histogram<double> _criticLoss;
     private static readonly Histogram<double> _criticLearningRate;
@@ -23,7 +23,7 @@ public static class Meters
         
         _actorLearningRate = meter.CreateHistogram<double>("actor_learning_rate");
         _reward = meter.CreateHistogram<double>("reward");
-        _epLength = meter.CreateHistogram<double>("ep_length");
+        _epLength = meter.CreateHistogram<int>("ep_length");
         _actorLoss = meter.CreateHistogram<double>("actor_loss");
         _criticLoss = meter.CreateHistogram<double>("critic_loss");
         _criticLearningRate = meter.CreateHistogram<double>("critic_learning_rate");
@@ -74,12 +74,14 @@ public static class Meters
         }
     }
 
-    public static void UpdateReward(double? reward)
+    public static void UpdateReward(double reward)
     {
-        if (reward.HasValue)
-        {
-            _reward.Record(reward.Value);
-        }
+        _reward.Record(reward);
+    }
+
+    public static void UpdateEpisodeLength(int episodeLength)
+    {
+        _epLength.Record(episodeLength);
     }
 
     public static void UpdateEpsilon(double? epsilon)

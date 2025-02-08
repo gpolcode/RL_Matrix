@@ -18,7 +18,7 @@ public class TrainingHostedService : IHostedService
 
         const string saveDirectory = @"C:/Users/Elsahr/Downloads/agent_storage";
 
-        var envs = Enumerable.Repeat(0, 10).Select(x => new CartPole()).ToList();
+        var envs = Enumerable.Repeat(0, 25).Select(x => new CartPole()).ToList();
         var myAgent = new LocalDiscreteRolloutAgent<float[]>(opts, envs);
 
         var newestSaveDirectory = new DirectoryInfo(saveDirectory)

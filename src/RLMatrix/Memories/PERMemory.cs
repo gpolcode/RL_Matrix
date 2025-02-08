@@ -1,11 +1,6 @@
 ﻿using RLMatrix;
 using RLMatrix.Agents.Common;
-using RLMatrix.Dashboard;
 using RLMatrix.Memories;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.Serialization.Formatters.Binary;
 
 /// <summary>
 /// The PrioritizedReplayMemory class represents a prioritized memory of the agent in reinforcement learning.
@@ -121,8 +116,9 @@ public class PrioritizedReplayMemory<TState> : IMemory<TState>, IStorableMemory
                 episodeLength++;
                 currentTransition = currentTransition.nextTransition;
             }
-            DashboardProvider.Instance.UpdateEpisodeData(episodeReward, episodeReward, episodeLength);
 
+            Meters.UpdateReward(episodeReward);
+            Meters.UpdateEpisodeLength(episodeLength);
         }
     }
 

@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.IO;
-using RLMatrix.Memories;
+﻿using RLMatrix.Memories;
 using RLMatrix.Agents.Common;
-using RLMatrix.Dashboard;
 
 namespace RLMatrix
 {
@@ -89,7 +83,8 @@ namespace RLMatrix
                     currentTransition = currentTransition.nextTransition;
                 }
 
-                DashboardProvider.Instance.UpdateEpisodeData(episodeReward, episodeReward, episodeLength);
+                Meters.UpdateReward(episodeReward);
+                Meters.UpdateEpisodeLength(episodeLength);
             }
         }
 

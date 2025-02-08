@@ -151,6 +151,8 @@ namespace RLMatrix
             double epsThreshold = agent.Options.EPS_END + (agent.Options.EPS_START - agent.Options.EPS_END) *
                 Math.Exp(-1.0 * agent.episodeCount / agent.Options.EPS_DECAY);
 
+            Meters.UpdateEpsilon(epsThreshold);
+
             for (int i = 0; i < states.Length; i++)
             {
                 if (agent.Random.NextDouble() > epsThreshold || !isTraining)
@@ -234,6 +236,8 @@ namespace RLMatrix
         {
             double epsThreshold = agent.Options.EPS_END + (agent.Options.EPS_START - agent.Options.EPS_END) *
                 Math.Exp(-1.0 * agent.episodeCount / agent.Options.EPS_DECAY);
+
+            Meters.UpdateEpsilon(epsThreshold);
 
             Tensor stateTensor = Utilities<T>.StateBatchToTensor(states, agent.Device);
             Tensor qValuesAllHeads;
@@ -354,6 +358,8 @@ namespace RLMatrix
         {
             double epsThreshold = agent.Options.EPS_END + (agent.Options.EPS_START - agent.Options.EPS_END) *
                 Math.Exp(-1.0 * agent.episodeCount / agent.Options.EPS_DECAY);
+
+            Meters.UpdateEpsilon(epsThreshold);
 
             Tensor stateTensor = Utilities<T>.StateBatchToTensor(states, agent.Device);
             Tensor qValuesAllHeads;

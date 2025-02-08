@@ -1,12 +1,9 @@
 ﻿using RLMatrix.Agents.Common;
 using RLMatrix.Agents.DQN.Domain;
-using RLMatrix.Dashboard;
 using RLMatrix.Memories;
-using System;
 using TorchSharp;
 using TorchSharp.Modules;
 using static TorchSharp.torch;
-using static TorchSharp.torch.optim;
 using static TorchSharp.torch.optim.lr_scheduler;
 
 namespace RLMatrix.Agents.PPO.Implementations
@@ -264,9 +261,9 @@ namespace RLMatrix.Agents.PPO.Implementations
                         if(i == 0)
                         {
 
-                            DashboardProvider.Instance.UpdateEntropy((double)maskedEntropy.mean().item<float>());
-                            DashboardProvider.Instance.UpdateActorLoss((double)actorLoss.item<float>());
-                            DashboardProvider.Instance.UpdateActorLearningRate(actorLrScheduler.get_last_lr().FirstOrDefault());
+                            Meters.UpdateEntropy((double)maskedEntropy.mean().item<float>());
+                            Meters.UpdateActorLoss((double)actorLoss.item<float>());
+                            Meters.UpdateActorLearningRate(actorLrScheduler.get_last_lr().FirstOrDefault());
                         }
                         
                     }
@@ -291,8 +288,8 @@ namespace RLMatrix.Agents.PPO.Implementations
                         criticOptimizer.step();
                         if (i == 0)
                         {
-                            DashboardProvider.Instance.UpdateCriticLoss((double)criticLoss.item<float>());
-                            DashboardProvider.Instance.UpdateCriticLearningRate(criticLrScheduler.get_last_lr().FirstOrDefault());
+                            Meters.UpdateCriticLoss((double)criticLoss.item<float>());
+                            Meters.UpdateCriticLearningRate(criticLrScheduler.get_last_lr().FirstOrDefault());
                         }
                     }
                 }
@@ -490,15 +487,11 @@ namespace RLMatrix.Agents.PPO.Implementations
                                 if(i == 0)
                                 {
                                     Tensor klDivergence = (policyOld.exp() * (policyOld - policy)).mean();
-                                    DashboardProvider.Instance.UpdateKLDivergence((double)klDivergence.item<float>());
-
-                                   // DashboardProvider.Instance.UpdateKLDivergence((double)klDivergence.item<float>());
-
-
-                                    DashboardProvider.Instance.UpdateKLDivergence((double)klDivergence.item<float>());
-                                    DashboardProvider.Instance.UpdateEntropy((double)entropy.mean().item<float>());
-                                    DashboardProvider.Instance.UpdateActorLoss((double)actorLoss.item<float>());
-                                    DashboardProvider.Instance.UpdateActorLearningRate(actorLrScheduler.get_last_lr().FirstOrDefault());
+                                    Meters.UpdateKLDivergence((double)klDivergence.item<float>());
+                                    Meters.UpdateKLDivergence((double)klDivergence.item<float>());
+                                    Meters.UpdateEntropy((double)entropy.mean().item<float>());
+                                    Meters.UpdateActorLoss((double)actorLoss.item<float>());
+                                    Meters.UpdateActorLearningRate(actorLrScheduler.get_last_lr().FirstOrDefault());
                                 }                                
                             }
                         }
@@ -518,8 +511,8 @@ namespace RLMatrix.Agents.PPO.Implementations
 
                                 if (i == 0)
                                 {
-                                    DashboardProvider.Instance.UpdateCriticLoss((double)criticLoss.item<float>());
-                                    DashboardProvider.Instance.UpdateCriticLearningRate(actorLrScheduler.get_last_lr().FirstOrDefault());
+                                    Meters.UpdateCriticLoss((double)criticLoss.item<float>());
+                                    Meters.UpdateCriticLearningRate(actorLrScheduler.get_last_lr().FirstOrDefault());
                                 }
                             }
                         }
