@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>net8.0;netstandard2.0</TargetFrameworks>
+		<TargetFrameworks>net8.0</TargetFrameworks>
 		<LangVersion>latest</LangVersion>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
@@ -10,10 +10,6 @@
 
 	<PropertyGroup Condition="'$(TargetFramework)' == 'net8.0'">
 		<DefineConstants>NET8_0</DefineConstants>
-	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
-		<DefineConstants>NETSTANDARD2_0</DefineConstants>
 	</PropertyGroup>
 
 	<PropertyGroup>
@@ -51,8 +47,8 @@
 	<ItemGroup>
 		<PackageReference Include="IEnumerableUnpacker" Version="1.0.3" />
 		<PackageReference Include="System.Reactive" Version="6.0.1" />
-		<PackageReference Include="TorchSharp-cuda-windows" Version="0.102.2" />
-		<PackageReference Include="TorchVision" Version="0.102.2" />
+		<PackageReference Include="TorchSharp" Version="0.102.2" />
+		<PackageReference Include="TorchSharp-cuda-linux" Version="0.102.2" />
 		<PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.1" />
 	</ItemGroup>
 	

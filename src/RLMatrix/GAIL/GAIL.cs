@@ -2,17 +2,9 @@
 using RLMatrix;
 using RLMatrix.GAILNET;
 using RLMatrix.Memories;
-using RLMatrix.Utils;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TorchSharp;
 using TorchSharp.Modules;
 using static TorchSharp.torch;
-using static TorchSharp.torch.optim;
-using static TorchSharp.torchvision;
 
 public class GAIL<T>
 {
@@ -39,10 +31,10 @@ public class GAIL<T>
         if (expertDemonstrations == null)
         {
             throw new ArgumentNullException("Expert Demonstrations cannot be null");
-        }   
+        }
         this.expertDemonstrations = expertDemonstrations;
         this.myOptions = gailOptions;
-        
+
     }
 
     public void Initialise(OneOf<int, (int, int)> obSize, int[] actionSize, (float, float)[] continousActions, Device myDevice)
@@ -75,7 +67,7 @@ public class GAIL<T>
 
     public Tensor AugmentRewards(Tensor states, Tensor actions, Tensor rewards)
     {
-        using(torch.no_grad())
+        using (torch.no_grad())
         {
 
             // Combine states and actions for a forward pass through the network
