@@ -85,7 +85,6 @@ namespace RLMatrix.Agents.Common
                     {
                         transitionsToShip.Add(transition);
                     }
-                    Meters.UpdateReward(episode.cumulativeReward);
                     episode.CompletedEpisodes.Clear();
                     completedEpisodes.Add((key, true));
                 }
@@ -166,7 +165,6 @@ namespace RLMatrix.Agents.Common
                 if (isDone)
                 {
                     transitionsToShip.AddRange(episode.CompletedEpisodes);
-                    Meters.UpdateReward(episode.cumulativeReward);
                     episode.CompletedEpisodes.Clear();
                     completedEpisodes.Add((key, true));
                 }

@@ -3,7 +3,6 @@
     public class Episode<T>
     {
         Guid? guidCache;
-        public float cumulativeReward = 0;
         private List<TransitionPortable<T>> TempBuffer = new();
         public List<TransitionPortable<T>> CompletedEpisodes = new();
 
@@ -13,7 +12,6 @@
             if (guidCache == null)
             {
                 guidCache = Guid.NewGuid();
-                cumulativeReward = 0;
             }
             if (!isDone)
             {
@@ -24,7 +22,6 @@
 
             var transition = new TransitionPortable<T>((Guid)guidCache, state, discreteActions, continuousActions, reward, nextGuid);
             TempBuffer.Add(transition);
-            cumulativeReward += reward;
             guidCache = nextGuid;
             if (isDone)
             {
