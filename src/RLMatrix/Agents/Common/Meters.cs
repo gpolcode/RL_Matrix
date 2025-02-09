@@ -18,9 +18,10 @@ public static class Meters
     private static readonly Histogram<double> _loss;
     private static readonly Histogram<double> _learningRate;
 
-    static Meters() {
+    static Meters()
+    {
         var meter = new Meter(MeterName);
-        
+
         _actorLearningRate = meter.CreateHistogram<double>("actor_learning_rate");
         _reward = meter.CreateHistogram<double>("reward");
         _epLength = meter.CreateHistogram<int>("ep_length");

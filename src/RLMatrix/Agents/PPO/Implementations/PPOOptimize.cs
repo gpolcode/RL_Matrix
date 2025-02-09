@@ -219,7 +219,7 @@ namespace RLMatrix.Agents.PPO.Implementations
                 Tensor actionBatch = torch.cat(actionBatches.ToArray(), dim: 0);
 
                 Tensor policyOld = actorNet.get_log_prob(stateBatch, actionBatch, ActionSizes.Count(), continuousActionBounds.Count()).detach();
-                
+
                 Tensor valueOld = criticNet.forward(stateBatch).detach().squeeze(1);
 
                 //Tensor maskedPolicyOld = torch.masked_select(policyOld, mask.to_type(ScalarType.Bool));
@@ -258,14 +258,13 @@ namespace RLMatrix.Agents.PPO.Implementations
                         actorLoss.backward();
                         torch.nn.utils.clip_grad_norm_(actorNet.parameters(), myOptions.ClipGradNorm);
                         actorOptimizer.step();
-                        if(i == 0)
+                        if (i == 0)
                         {
-
                             Meters.UpdateEntropy((double)maskedEntropy.mean().item<float>());
                             Meters.UpdateActorLoss((double)actorLoss.item<float>());
                             Meters.UpdateActorLearningRate(actorLrScheduler.get_last_lr().FirstOrDefault());
                         }
-                        
+
                     }
 
                     using (var criticScope = torch.NewDisposeScope())
@@ -295,7 +294,7 @@ namespace RLMatrix.Agents.PPO.Implementations
                 }
             }
 
-           
+
             myReplayBuffer.ClearMemory();
         }
 
@@ -371,7 +370,7 @@ namespace RLMatrix.Agents.PPO.Implementations
         //This could potentially have better performance but due to some error doesnt want to learn :) 
         void OptimizeRNNPacked(IMemory<T> replayBuffer)
         {
-            
+
             using (var scope = torch.NewDisposeScope())
             {
                 var transitions = replayBuffer.SampleEntireMemory();
@@ -424,7 +423,7 @@ namespace RLMatrix.Agents.PPO.Implementations
         }
 
 
-       public void Optimize(IMemory<T> replayBuffer)
+        public void Optimize(IMemory<T> replayBuffer)
         {
             if (myOptions.UseRNN && myOptions.BatchSize > 1)
             {
@@ -484,7 +483,7 @@ namespace RLMatrix.Agents.PPO.Implementations
                                 actorOptimizer.step();
 
 
-                                if(i == 0)
+                                if (i == 0)
                                 {
                                     Tensor klDivergence = (policyOld.exp() * (policyOld - policy)).mean();
                                     Meters.UpdateKLDivergence((double)klDivergence.item<float>());
@@ -492,7 +491,7 @@ namespace RLMatrix.Agents.PPO.Implementations
                                     Meters.UpdateEntropy((double)entropy.mean().item<float>());
                                     Meters.UpdateActorLoss((double)actorLoss.item<float>());
                                     Meters.UpdateActorLearningRate(actorLrScheduler.get_last_lr().FirstOrDefault());
-                                }                                
+                                }
                             }
                         }
 
@@ -542,5 +541,5 @@ namespace RLMatrix.Agents.PPO.Implementations
 }
 
 
-    
+
 

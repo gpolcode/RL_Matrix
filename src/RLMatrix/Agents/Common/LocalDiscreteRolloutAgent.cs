@@ -76,7 +76,6 @@ namespace RLMatrix.Agents.Common
             var nextStateResults = await Task.WhenAll(nextStateTaskList);
 
             ConcurrentBag<TransitionPortable<TState>> transitionsToShip = new ConcurrentBag<TransitionPortable<TState>>();
-            ConcurrentBag<double> rewards = new ConcurrentBag<double>();
             var completedEpisodes = new List<(Guid environmentId, bool done)>();
 
             foreach (var env in _environments)
@@ -97,7 +96,8 @@ namespace RLMatrix.Agents.Common
                     {
                         transitionsToShip.Add(transition);
                     }
-                    rewards.Add(episode.cumulativeReward);
+
+                    Meters.UpdateReward(episode.cumulativeReward);
                     episode.CompletedEpisodes.Clear();
                     completedEpisodes.Add((key, true));
                 }
@@ -153,7 +153,6 @@ namespace RLMatrix.Agents.Common
             }
 
             var transitionsToShip = new List<TransitionPortable<TState>>();
-            var rewards = new List<double>();
             var completedEpisodes = new List<(Guid environmentId, bool done)>();
 
             foreach (var env in _environments)
@@ -171,7 +170,7 @@ namespace RLMatrix.Agents.Common
                 if (isDone)
                 {
                     transitionsToShip.AddRange(episode.CompletedEpisodes);
-                    rewards.Add(episode.cumulativeReward);
+                    Meters.UpdateReward(episode.cumulativeReward);
                     episode.CompletedEpisodes.Clear();
                     completedEpisodes.Add((key, true));
                 }
@@ -214,10 +213,10 @@ namespace RLMatrix.Agents.Common
             return _agent.SelectActionsBatchAsync(stateInfos, isTraining);
         }
 #else
-    public Task<Dictionary<Guid, int[]>> GetActionsBatchAsync(List<(Guid environmentId, TState state)> stateInfos, bool isTraining)
-    {
-        return _agent.SelectActionsBatchAsync(stateInfos, isTraining);
-    }
+        public Task<Dictionary<Guid, int[]>> GetActionsBatchAsync(List<(Guid environmentId, TState state)> stateInfos, bool isTraining)
+        {
+            return _agent.SelectActionsBatchAsync(stateInfos, isTraining);
+        }
 #endif
 
         private TState DeepCopy(TState input)
